@@ -13,6 +13,14 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Integration", "Integration"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vasis.Erp.Facil.Integracoes.ZeusMdfe", "Integration\Vasis.Erp.Facil.Integracoes.ZeusMdfe\Vasis.Erp.Facil.Integracoes.ZeusMdfe.csproj", "{335C89F3-DAD6-4EFB-9A9C-94058FE990B2}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Backend", "Backend", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Frontend", "Frontend", "{FD329753-3886-4234-AFAD-EC896D238D3D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "External", "External", "{FDE416CA-6FA4-4911-BD05-CEF213428254}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{7398A03A-7024-4888-944A-39D2202B4FED}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -67,5 +75,8 @@ Global
 		{04458E25-9268-41FE-B6E8-86FD4B8209D7} = {4F52FD11-658E-A102-6CD3-7D7C16FFA15B}
 		{71A78858-1111-400D-9279-70AB495080FF} = {4F52FD11-658E-A102-6CD3-7D7C16FFA15B}
 		{335C89F3-DAD6-4EFB-9A9C-94058FE990B2} = {823D4020-332D-2C13-F261-6F510F11A57E}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {104C24FD-323E-4996-865E-6F3824571084}
 	EndGlobalSection
 EndGlobal
