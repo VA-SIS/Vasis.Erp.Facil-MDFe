@@ -4,7 +4,7 @@ public class MotoristaDto
 {
     public Guid Id { get; set; }
     public string Nome { get; set; } = string.Empty;
-    public string? Cpf { get; set; }
+    public string? NumeroCpf { get; set; }
     public string? Cnh { get; set; }
     public string? Categoria { get; set; }
 
