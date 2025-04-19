@@ -1,5 +1,5 @@
 ﻿using FluentValidation;
-using Vasis.Erp.Facil.Shared.Entities.Cadastros;
+using Vasis.Erp.Facil.Shared.Domain.Entities;
 
 namespace Vasis.Erp.Facil.Shared.Validators.Cadastros;
 

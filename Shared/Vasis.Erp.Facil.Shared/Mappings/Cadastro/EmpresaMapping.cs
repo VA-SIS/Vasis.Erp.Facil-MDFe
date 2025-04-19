@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Vasis.Erp.Facil.Shared.Entities.Cadastros;
+using Vasis.Erp.Facil.Shared.Domain.Entities;
 
 namespace Vasis.Erp.Facil.Server.Mappings
 {

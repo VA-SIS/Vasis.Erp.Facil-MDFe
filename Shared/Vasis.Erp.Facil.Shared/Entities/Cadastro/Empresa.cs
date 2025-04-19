@@ -1,4 +1,4 @@
-﻿namespace Vasis.Erp.Facil.Shared.Entities.Cadastros;
+﻿namespace Vasis.Erp.Facil.Shared.Domain.Entities;
 public class Empresa
 {
     public Guid Id { get; set; }

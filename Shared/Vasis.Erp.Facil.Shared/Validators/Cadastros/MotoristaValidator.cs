@@ -1,7 +1,7 @@
 ﻿using FluentValidation;
-using Vasis.Erp.Facil.Shared.Entities.Cadastros;
+using Vasis.Erp.Facil.Shared.Domain.Entities;
 
-namespace Vasis.Erp.Facil.Shared.Validators.Cadastros;
+namespace Vasis.Erp.Facil.Shared.Domain.Validators;
 
 public class MotoristaValidator : AbstractValidator<Motorista>
 {
@@ -11,7 +11,7 @@ public class MotoristaValidator : AbstractValidator<Motorista>
             .NotEmpty().WithMessage("O nome do motorista é obrigatório.")
             .MaximumLength(200);
 
-        RuleFor(m => m.CpfCnpj).MaximumLength(20);
+        //RuleFor(m => m.Cpf).MaximumLength(20);
         RuleFor(m => m.NumeroCnh).MaximumLength(20);
         RuleFor(m => m.CategoriaCnh).MaximumLength(5);
     }
