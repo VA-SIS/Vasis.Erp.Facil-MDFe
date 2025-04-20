@@ -1,0 +1,6 @@
+@Vasis.Erp.Facil.Api_HostAddress = http://localhost:5284
+
+GET {{Vasis.Erp.Facil.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
