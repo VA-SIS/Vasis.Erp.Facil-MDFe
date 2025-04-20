@@ -8,6 +8,8 @@ namespace Vasis.Erp.Facil.Data.Context
         public DbSet<Empresa> Empresas { get; set; }
         public DbSet<Pessoa> Pessoas { get; set; }
         public DbSet<Transportadora> Transportadoras { get; set; }
+        public DbSet<Motorista> Motoristas { get; set; }
+
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options) { }

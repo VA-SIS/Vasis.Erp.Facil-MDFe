@@ -15,6 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Vasis.Erp.Facil.Application\Vasis.Erp.Facil.Application.csproj" />
     <ProjectReference Include="..\Vasis.Erp.Facil.Data\Vasis.Erp.Facil.Data.csproj" />
   </ItemGroup>
 

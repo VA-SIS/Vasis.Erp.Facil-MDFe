@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Vasis.Erp.Facil.Data.Context;
+using Vasis.Erp.Facil.Data.Seed;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,6 +15,12 @@ builder.Services.AddEndpointsApiExplorer();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var context = services.GetRequiredService<ApplicationDbContext>();
+    await DbSeeder.SeedAsync(context);
+}
 
 app.UseHttpsRedirection();
 app.UseAuthorization();
