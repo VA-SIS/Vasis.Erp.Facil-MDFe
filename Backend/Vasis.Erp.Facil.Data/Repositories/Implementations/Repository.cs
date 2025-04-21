@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
+using Vasis.Erp.Facil.Application.Dtos.Shared;
 using Vasis.Erp.Facil.Data.Context;
 using Vasis.Erp.Facil.Data.Repositories.Interfaces;
 using Vasis.Erp.Facil.Shared.Dtos.Common;
@@ -23,8 +24,7 @@ namespace Vasis.Erp.Facil.Data.Repositories.Implementations
         public virtual void Update(T entity) => _dbSet.Update(entity);
         public virtual void Remove(T entity) => _dbSet.Remove(entity);
 
-        // Fix for CS0535: Implementing GetPagedAsync
-        public virtual async Task<PagedResultDto<T>> GetPagedAsync(Expression<Func<T, bool>> filter, PagedRequestDto<T> request)
+        public virtual async Task<PagedResultDto<T>> GetPagedAsync(Expression<Func<T, bool>> filter, PagedRequestDto request)
         {
             var query = _dbSet.Where(filter);
 
@@ -59,9 +59,6 @@ namespace Vasis.Erp.Facil.Data.Repositories.Implementations
             }
         }
 
-        //public Task<PagedResultDto<T>> GetPagedAsync(Expression<Func<T, bool>>? filter, PagedRequestDto<T> request)
-        //{
-        //    throw new NotImplementedException();
-        //}
+   
     }
 }

@@ -1,14 +1,12 @@
-﻿using Vasis.Erp.Facil.Shared.Dtos.Cadastros;
-using Vasis.Erp.Facil.Shared.Dtos.Common;
+﻿using Vasis.Erp.Facil.Application.Dtos.Cadastros;
+using Vasis.Erp.Facil.Application.Dtos.Shared;
+using Vasis.Erp.Facil.Shared.Dtos.Cadastros;
 
-namespace Vasis.Erp.Facil.Application.Interfaces
+public interface ITransportadoraService
 {
-    public interface ITransportadoraService
-    {
-        Task<PagedResultDto<TransportadoraDto>> GetPagedAsync(PagedRequestDto<TransportadoraDto> request);
-        Task<TransportadoraDto> GetByIdAsync(Guid id);
-        Task<TransportadoraDto> CreateAsync(TransportadoraDto dto);
-        Task<TransportadoraDto> UpdateAsync(Guid id, TransportadoraDto dto);
-        Task DeleteAsync(Guid id);
-    }
+    Task<TransportadoraDto> GetByIdAsync(Guid id);
+    Task<TransportadoraDto> CreateAsync(TransportadoraDto dto);
+    Task<TransportadoraDto> UpdateAsync(Guid id, TransportadoraDto dto);
+    Task DeleteAsync(Guid id);
+    Task<PagedResultDto<TransportadoraDto>> GetPagedAsync(PagedRequestDto request);
 }

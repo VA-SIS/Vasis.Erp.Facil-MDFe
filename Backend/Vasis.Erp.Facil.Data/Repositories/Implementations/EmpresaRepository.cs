@@ -1,61 +1,16 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Vasis.Erp.Facil.Application.Dtos.Cadastros;
-using Vasis.Erp.Facil.Data.Context;
-using Vasis.Erp.Facil.Domain.Interfaces.Repositories;
+﻿using Vasis.Erp.Facil.Data.Context;
+using Vasis.Erp.Facil.Data.Repositories.Implementations.Base;
+using Vasis.Erp.Facil.Data.Repositories.Interfaces;
 using Vasis.Erp.Facil.Shared.Domain.Entities;
-using Vasis.Erp.Facil.Shared.Dtos.Common;
 
-namespace Vasis.Erp.Facil.Data.Repositories
+namespace Vasis.Erp.Facil.Data.Repositories.Implementations
 {
-    public class EmpresaRepository : IEmpresaRepository
+    public class EmpresaRepository : BaseRepository<Empresa>, IEmpresaRepository
     {
-        private readonly ApplicationDbContext _context;
-
-        public EmpresaRepository(ApplicationDbContext context)
+        public EmpresaRepository(ApplicationDbContext context) : base(context)
         {
-            _context = context;
         }
 
-        public async Task<IEnumerable<Empresa>> GetAllAsync()
-        {
-            return await _context.Empresas.AsNoTracking().ToListAsync();
-        }
-
-        public async Task<Empresa?> GetByIdAsync(Guid id)
-        {
-            return await _context.Empresas.AsNoTracking().FirstOrDefaultAsync(e => e.Id == id);
-        }
-
-        public async Task AddAsync(Empresa empresa)
-        {
-            _context.Empresas.Add(empresa);
-            await _context.SaveChangesAsync();
-        }
-
-        public async Task UpdateAsync(Empresa empresa)
-        {
-            _context.Empresas.Update(empresa);
-            await _context.SaveChangesAsync();
-        }
-
-        public async Task DeleteAsync(Guid id)
-        {
-            var empresa = await _context.Empresas.FindAsync(id);
-            if (empresa != null)
-            {
-                _context.Empresas.Remove(empresa);
-                await _context.SaveChangesAsync();
-            }
-        }
-
-        public async Task<bool> ExistsAsync(Guid id)
-        {
-            return await _context.Empresas.AnyAsync(e => e.Id == id);
-        }
-
-        public Task GetPagedAsync(Func<object, bool> value, PagedRequestDto<EmpresaDto> request)
-        {
-            throw new NotImplementedException();
-        }
+        // Aqui você pode colocar métodos específicos de Empresa futuramente
     }
 }

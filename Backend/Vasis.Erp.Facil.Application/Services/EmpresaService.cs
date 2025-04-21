@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
 using Vasis.Erp.Facil.Application.Dtos.Cadastros;
-using Vasis.Erp.Facil.Domain.Interfaces.Repositories;
+using Vasis.Erp.Facil.Application.Dtos.Shared;
+using Vasis.Erp.Facil.Data.Repositories.Interfaces;
 using Vasis.Erp.Facil.Shared.Domain.Entities;
-using Vasis.Erp.Facil.Shared.Dtos.Common;
 
 public class EmpresaService : IEmpresaService
 {
@@ -13,20 +13,6 @@ public class EmpresaService : IEmpresaService
     {
         _repository = repository;
         _mapper = mapper;
-    }
-
-    public async Task<PagedResultDto<EmpresaDto>> GetPagedAsync(PagedRequestDto<EmpresaDto> request)
-    {
-        var result = await _repository.GetPagedAsync(
-            e => string.IsNullOrEmpty(request.Filter) || e.Nome.Contains(request.Filter),
-            request
-        );
-
-        return new PagedResultDto<EmpresaDto>
-        {
-            Items = result.Items.Select(_mapper.Map<EmpresaDto>).ToList(),
-            TotalCount = result.TotalCount
-        };
     }
 
     public async Task<EmpresaDto> GetByIdAsync(Guid id)
@@ -53,5 +39,20 @@ public class EmpresaService : IEmpresaService
     public async Task DeleteAsync(Guid id)
     {
         await _repository.DeleteAsync(id);
+    }
+
+    public async Task<PagedResultDto<EmpresaDto>> GetPagedAsync(PagedRequestDto request)
+    {
+        var result = await _repository.GetPagedAsync(
+            e => string.IsNullOrWhiteSpace(request.Filter) ||
+                 e.RazaoSocial.Contains(request.Filter, StringComparison.OrdinalIgnoreCase),
+            request
+        );
+
+        return new PagedResultDto<EmpresaDto>
+        {
+            Items = result.Items.Select(_mapper.Map<EmpresaDto>).ToList(),
+            TotalCount = result.TotalCount
+        };
     }
 }

@@ -1,9 +1,9 @@
-﻿using Vasis.Erp.Facil.Application.Interfaces.Services;
-using Vasis.Erp.Facil.Data.Context;
+﻿using Vasis.Erp.Facil.Data.Context;
 using Microsoft.EntityFrameworkCore;
 using Vasis.Erp.Facil.Shared.Domain.Entities;
 using Vasis.Erp.Facil.Shared.Dtos.Cadastros;
-using Vasis.Erp.Facil.Shared.Dtos.Common;
+using Vasis.Erp.Facil.Application.Dtos.Shared;
+using System.Linq;
 
 namespace Vasis.Erp.Facil.Application.Services
 {
@@ -18,6 +18,11 @@ namespace Vasis.Erp.Facil.Application.Services
 
         public async Task<PagedResultDto<MotoristaDto>> GetPagedAsync(PagedRequestDto<MotoristaDto> request)
         {
+            if (request is null)
+            {
+                throw new ArgumentNullException(nameof(request));
+            }
+
             var query = _context.Motoristas.AsQueryable();
 
             var total = await query.CountAsync();
@@ -28,10 +33,10 @@ namespace Vasis.Erp.Facil.Application.Services
                 {
                     Id = m.Id,
                     Nome = m.Nome,
-                    Cpf = m.Cpf,
+                    //Cpf = m.Cpf,
                     Cnh = m.Cnh,
-                    Categoria = m.Categoria,
-                    Validade = m.Validade
+                    Categoria = m.Categoria
+                    //Validade = m.Validade
                 })
                 .ToListAsync();
 
@@ -48,10 +53,10 @@ namespace Vasis.Erp.Facil.Application.Services
             {
                 Id = entity.Id,
                 Nome = entity.Nome,
-                Cpf = entity.Cpf,
-                Cnh = entity.Cnh,
-                Categoria = entity.Categoria,
-                Validade = entity.Validade
+                NumeroCpf = entity.NumeroCpf,
+                Cnh = entity.Cnh
+                //Categoria = entity.Categoria,
+                //Validade = entity.Validade
             };
         }
 
@@ -62,9 +67,9 @@ namespace Vasis.Erp.Facil.Application.Services
                 Id = Guid.NewGuid(),
                 Nome = dto.Nome,
                 NumeroCpf = dto.NumeroCpf,
-                NumeroCnh = dto.Cnh,
-                Categoria = dto.Categoria,
-                Validade = dto.Validade
+                NumeroCnh = dto.Cnh
+                //Categoria = dto.Categoria,
+                //Validade = dto.Validade
             };
 
             _context.Motoristas.Add(entity);
@@ -81,10 +86,10 @@ namespace Vasis.Erp.Facil.Application.Services
             if (entity == null) return null;
 
             entity.Nome = dto.Nome;
-            entity.Cpf = dto.Cpf;
-            entity.Cnh = dto.Cnh;
-            entity.Categoria = dto.Categoria;
-            entity.Validade = dto.Validade;
+            entity.NumeroCpf = dto.NumeroCpf;
+            entity.NumeroCnh = dto.Cnh;
+            //entity.Categoria = dto.Categoria;
+            //entity.Validade = dto.Validade;
 
             _context.Motoristas.Update(entity);
             await _context.SaveChangesAsync();
@@ -101,6 +106,11 @@ namespace Vasis.Erp.Facil.Application.Services
                 _context.Motoristas.Remove(entity);
                 await _context.SaveChangesAsync();
             }
+        }
+
+        public Task<PagedResultDto<MotoristaDto>> GetPagedAsync(PagedRequestDto request)
+        {
+            throw new NotImplementedException();
         }
     }
 }
