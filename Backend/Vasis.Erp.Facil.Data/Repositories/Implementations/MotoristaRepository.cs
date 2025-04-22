@@ -1,17 +1,49 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Vasis.Erp.Facil.Data.Context;
-using Vasis.Erp.Facil.Data.Repositories.Interfaces;
+﻿using Vasis.Erp.Facil.Domain.Repositories;
+using Microsoft.EntityFrameworkCore;
 using Vasis.Erp.Facil.Shared.Domain.Entities;
+using Vasis.Erp.Facil.Data.Context;
 
 namespace Vasis.Erp.Facil.Data.Repositories.Implementations
 {
-    public class MotoristaRepository : Repository<Motorista>, IMotoristaRepository
+    public class MotoristaRepository : IMotoristaRepository
     {
-        public MotoristaRepository(ApplicationDbContext context) : base(context) { }
+        private readonly ApplicationDbContext _context;
 
-        public async Task<Motorista?> GetByCpfAsync(string cpf)
+        public MotoristaRepository(ApplicationDbContext context)
         {
-            return await _dbSet.FirstOrDefaultAsync(m => m.NumeroCpf == cpf);
+            _context = context;
+        }
+
+        public async Task<Motorista?> ObterPorIdAsync(Guid id)
+        {
+            return await _context.Motoristas.FindAsync(id);
+        }
+
+        public async Task<List<Motorista>> ListarAsync()
+        {
+            return await _context.Motoristas.ToListAsync();
+        }
+
+        public async Task AdicionarAsync(Motorista entity)
+        {
+            await _context.Motoristas.AddAsync(entity);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task AtualizarAsync(Motorista entity)
+        {
+            _context.Motoristas.Update(entity);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task RemoverAsync(Guid id)
+        {
+            var entity = await ObterPorIdAsync(id);
+            if (entity != null)
+            {
+                _context.Motoristas.Remove(entity);
+                await _context.SaveChangesAsync();
+            }
         }
     }
 }

@@ -10,6 +10,7 @@ namespace Vasis.Erp.Facil.Data.Context
         public DbSet<Transportadora> Transportadoras { get; set; }
         public DbSet<Motorista> Motoristas { get; set; }
 
+        public DbSet<Veiculo> Veiculos { get; set; }
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options) { }

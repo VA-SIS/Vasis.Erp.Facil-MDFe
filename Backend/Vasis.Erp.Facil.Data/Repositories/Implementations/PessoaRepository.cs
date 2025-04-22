@@ -1,19 +1,49 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Vasis.Erp.Facil.Data.Context;
-using Vasis.Erp.Facil.Data.Repositories.Interfaces;
+﻿using Vasis.Erp.Facil.Domain.Repositories;
+using Microsoft.EntityFrameworkCore;
 using Vasis.Erp.Facil.Shared.Domain.Entities;
+using Vasis.Erp.Facil.Data.Context;
 
 namespace Vasis.Erp.Facil.Data.Repositories.Implementations
 {
-    public class PessoaRepository : Repository<Pessoa>, IPessoaRepository
+    public class PessoaRepository : IPessoaRepository
     {
-        public PessoaRepository(ApplicationDbContext context) : base(context) { }
+        private readonly ApplicationDbContext _context;
 
-        public async Task<IEnumerable<Pessoa>> BuscarPorNomeAsync(string nome)
+        public PessoaRepository(ApplicationDbContext context)
         {
-            return await _dbSet
-                .Where(p => EF.Functions.Like(p.Nome, $"%{nome}%"))
-                .ToListAsync();
+            _context = context;
+        }
+
+        public async Task<Pessoa?> ObterPorIdAsync(Guid id)
+        {
+            return await _context.Pessoas.FindAsync(id);
+        }
+
+        public async Task<List<Pessoa>> ListarAsync()
+        {
+            return await _context.Pessoas.ToListAsync();
+        }
+
+        public async Task AdicionarAsync(Pessoa entity)
+        {
+            await _context.Pessoas.AddAsync(entity);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task AtualizarAsync(Pessoa entity)
+        {
+            _context.Pessoas.Update(entity);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task RemoverAsync(Guid id)
+        {
+            var entity = await ObterPorIdAsync(id);
+            if (entity != null)
+            {
+                _context.Pessoas.Remove(entity);
+                await _context.SaveChangesAsync();
+            }
         }
     }
 }
