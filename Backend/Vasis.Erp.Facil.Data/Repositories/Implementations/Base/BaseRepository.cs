@@ -1,9 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Threading.Tasks;
 using Vasis.Erp.Facil.Application.Dtos.Shared;
 using Vasis.Erp.Facil.Data.Context;
 using Vasis.Erp.Facil.Data.Repositories.Interfaces.Base;

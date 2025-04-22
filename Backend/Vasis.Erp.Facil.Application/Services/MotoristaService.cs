@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System.Linq;
 using Vasis.Erp.Facil.Application.Dtos.Shared;
 using Vasis.Erp.Facil.Application.Interfaces.Services;
 using Vasis.Erp.Facil.Data.Context;
@@ -24,7 +23,7 @@ namespace Vasis.Erp.Facil.Application.Services
 
             var query = _context.Motoristas.AsQueryable();
 
-            var total = await query.CountAsync();
+            int total = await query.CountAsync();
 
             var items = await query
                 .Skip(request.Skip)
@@ -34,8 +33,8 @@ namespace Vasis.Erp.Facil.Application.Services
                     Id = m.Id,
                     Nome = m.Nome,
                     NumeroCpf = m.NumeroCpf,
-                    Cnh = m.NumeroCnh,
-                    Categoria = m.Categoria
+                    NumeroCnh = m.NumeroCnh,
+                    CategoriaCnh = m.Categoria
                 })
                 .ToListAsync();
 
@@ -53,8 +52,8 @@ namespace Vasis.Erp.Facil.Application.Services
                 Id = entity.Id,
                 Nome = entity.Nome,
                 NumeroCpf = entity.NumeroCpf,
-                Cnh = entity.NumeroCnh,
-                Categoria = entity.Categoria
+                NumeroCnh = entity.NumeroCnh,
+                CategoriaCnh = entity.CategoriaCnh
             };
         }
 
@@ -65,8 +64,8 @@ namespace Vasis.Erp.Facil.Application.Services
                 Id = Guid.NewGuid(),
                 Nome = dto.Nome,
                 NumeroCpf = dto.NumeroCpf,
-                NumeroCnh = dto.Cnh,
-                Categoria = dto.Categoria
+                NumeroCnh = dto.NumeroCnh,
+                CategoriaCnh = dto.CategoriaCnh
             };
 
             _context.Motoristas.Add(entity);
@@ -83,8 +82,8 @@ namespace Vasis.Erp.Facil.Application.Services
 
             entity.Nome = dto.Nome;
             entity.NumeroCpf = dto.NumeroCpf;
-            entity.NumeroCnh = dto.Cnh;
-            entity.Categoria = dto.Categoria;
+            entity.NumeroCnh = dto.NumeroCnh;
+            entity.CategoriaCnh = dto.CategoriaCnh;
 
             _context.Motoristas.Update(entity);
             await _context.SaveChangesAsync();

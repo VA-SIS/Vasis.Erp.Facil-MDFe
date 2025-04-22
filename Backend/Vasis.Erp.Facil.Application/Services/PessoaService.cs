@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using Vasis.Erp.Facil.Application.Dtos.Cadastros;
 using Vasis.Erp.Facil.Application.Dtos.Shared;
+using Vasis.Erp.Facil.Application.Interfaces.Services;
 using Vasis.Erp.Facil.Data.Repositories.Interfaces;
 using Vasis.Erp.Facil.Shared.Domain.Entities;
 using Vasis.Erp.Facil.Shared.Dtos.Cadastros;

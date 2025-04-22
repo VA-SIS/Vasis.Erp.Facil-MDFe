@@ -1,9 +1,11 @@
 ﻿using AutoMapper;
 using Vasis.Erp.Facil.Application.Dtos.Shared;
-using Vasis.Erp.Facil.Application.Interfaces;
+using Vasis.Erp.Facil.Application.Interfaces.Repositories;
+using Vasis.Erp.Facil.Application.Interfaces.Services;
 using Vasis.Erp.Facil.Shared.Domain.Entities;
 using Vasis.Erp.Facil.Shared.Dtos.Cadastros;
 
+namespace Vasis.Erp.Facil.Data.Repositories.Interfaces;
 public class TransportadoraService : ITransportadoraService
 {
     private readonly ITransportadoraRepository _repository;
