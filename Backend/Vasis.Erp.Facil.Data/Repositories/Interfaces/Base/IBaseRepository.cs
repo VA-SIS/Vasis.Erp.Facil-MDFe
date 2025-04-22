@@ -1,5 +1,5 @@
 ﻿using System.Linq.Expressions;
-using Vasis.Erp.Facil.Application.Dtos.Shared;   // <— aqui
+using Vasis.Erp.Facil.Application.Dtos.Shared;
 
 namespace Vasis.Erp.Facil.Data.Repositories.Interfaces.Base
 {
@@ -12,8 +12,6 @@ namespace Vasis.Erp.Facil.Data.Repositories.Interfaces.Base
         Task<T> UpdateAsync(T entity);
         Task DeleteAsync(Guid id);
         Task<bool> ExistsAsync(Guid id);
-
-        // ==== Alinhado para usar PagedRequestDto ====
         Task<PagedResultDto<T>> GetPagedAsync(
             Expression<Func<T, bool>> predicate,
             PagedRequestDto request
