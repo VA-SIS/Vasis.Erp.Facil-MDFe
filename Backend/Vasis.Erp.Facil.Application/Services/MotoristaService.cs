@@ -1,9 +1,10 @@
-﻿using Vasis.Erp.Facil.Data.Context;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
+using System.Linq;
+using Vasis.Erp.Facil.Application.Dtos.Shared;
+using Vasis.Erp.Facil.Application.Interfaces.Services;
+using Vasis.Erp.Facil.Data.Context;
 using Vasis.Erp.Facil.Shared.Domain.Entities;
 using Vasis.Erp.Facil.Shared.Dtos.Cadastros;
-using Vasis.Erp.Facil.Application.Dtos.Shared;
-using System.Linq;
 
 namespace Vasis.Erp.Facil.Application.Services
 {
@@ -16,16 +17,15 @@ namespace Vasis.Erp.Facil.Application.Services
             _context = context;
         }
 
-        public async Task<PagedResultDto<MotoristaDto>> GetPagedAsync(PagedRequestDto<MotoristaDto> request)
+        public async Task<PagedResultDto<MotoristaDto>> GetPagedAsync(PagedRequestDto request)
         {
             if (request is null)
-            {
                 throw new ArgumentNullException(nameof(request));
-            }
 
             var query = _context.Motoristas.AsQueryable();
 
             var total = await query.CountAsync();
+
             var items = await query
                 .Skip(request.Skip)
                 .Take(request.Take)
@@ -33,10 +33,9 @@ namespace Vasis.Erp.Facil.Application.Services
                 {
                     Id = m.Id,
                     Nome = m.Nome,
-                    //Cpf = m.Cpf,
-                    Cnh = m.Cnh,
+                    NumeroCpf = m.NumeroCpf,
+                    Cnh = m.NumeroCnh,
                     Categoria = m.Categoria
-                    //Validade = m.Validade
                 })
                 .ToListAsync();
 
@@ -54,9 +53,8 @@ namespace Vasis.Erp.Facil.Application.Services
                 Id = entity.Id,
                 Nome = entity.Nome,
                 NumeroCpf = entity.NumeroCpf,
-                Cnh = entity.Cnh
-                //Categoria = entity.Categoria,
-                //Validade = entity.Validade
+                Cnh = entity.NumeroCnh,
+                Categoria = entity.Categoria
             };
         }
 
@@ -67,9 +65,8 @@ namespace Vasis.Erp.Facil.Application.Services
                 Id = Guid.NewGuid(),
                 Nome = dto.Nome,
                 NumeroCpf = dto.NumeroCpf,
-                NumeroCnh = dto.Cnh
-                //Categoria = dto.Categoria,
-                //Validade = dto.Validade
+                NumeroCnh = dto.Cnh,
+                Categoria = dto.Categoria
             };
 
             _context.Motoristas.Add(entity);
@@ -82,14 +79,12 @@ namespace Vasis.Erp.Facil.Application.Services
         public async Task<MotoristaDto> UpdateAsync(Guid id, MotoristaDto dto)
         {
             var entity = await _context.Motoristas.FindAsync(id);
-
             if (entity == null) return null;
 
             entity.Nome = dto.Nome;
             entity.NumeroCpf = dto.NumeroCpf;
             entity.NumeroCnh = dto.Cnh;
-            //entity.Categoria = dto.Categoria;
-            //entity.Validade = dto.Validade;
+            entity.Categoria = dto.Categoria;
 
             _context.Motoristas.Update(entity);
             await _context.SaveChangesAsync();
@@ -100,17 +95,11 @@ namespace Vasis.Erp.Facil.Application.Services
         public async Task DeleteAsync(Guid id)
         {
             var entity = await _context.Motoristas.FindAsync(id);
-
             if (entity != null)
             {
                 _context.Motoristas.Remove(entity);
                 await _context.SaveChangesAsync();
             }
-        }
-
-        public Task<PagedResultDto<MotoristaDto>> GetPagedAsync(PagedRequestDto request)
-        {
-            throw new NotImplementedException();
         }
     }
 }

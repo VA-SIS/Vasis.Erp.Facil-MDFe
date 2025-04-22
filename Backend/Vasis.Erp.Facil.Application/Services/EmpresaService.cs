@@ -1,8 +1,11 @@
 ﻿using AutoMapper;
 using Vasis.Erp.Facil.Application.Dtos.Cadastros;
 using Vasis.Erp.Facil.Application.Dtos.Shared;
+using Vasis.Erp.Facil.Application.Interfaces.Services;
 using Vasis.Erp.Facil.Data.Repositories.Interfaces;
 using Vasis.Erp.Facil.Shared.Domain.Entities;
+
+namespace Vasis.Erp.Facil.Application.Services;
 
 public class EmpresaService : IEmpresaService
 {

@@ -1,7 +1,7 @@
-﻿using Vasis.Erp.Facil.Application.Dtos.Cadastros;
-using Vasis.Erp.Facil.Application.Dtos.Shared;
+﻿using Vasis.Erp.Facil.Application.Dtos.Shared;
 using Vasis.Erp.Facil.Shared.Dtos.Cadastros;
 
+namespace Vasis.Erp.Facil.Application.Interfaces.Services;
 public interface ITransportadoraService
 {
     Task<TransportadoraDto> GetByIdAsync(Guid id);

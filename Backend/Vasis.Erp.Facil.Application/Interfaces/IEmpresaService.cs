@@ -1,6 +1,7 @@
 ﻿using Vasis.Erp.Facil.Application.Dtos.Cadastros;
 using Vasis.Erp.Facil.Application.Dtos.Shared;
 
+namespace Vasis.Erp.Facil.Application.Interfaces.Services;
 public interface IEmpresaService
 {
     Task<EmpresaDto> GetByIdAsync(Guid id);
