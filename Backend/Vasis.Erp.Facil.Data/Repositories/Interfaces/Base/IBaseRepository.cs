@@ -1,7 +1,7 @@
-﻿using Vasis.Erp.Facil.Application.Dtos.Shared;
-using Vasis.Erp.Facil.Shared.Dtos.Common;
+﻿using System.Linq.Expressions;
+using Vasis.Erp.Facil.Application.Dtos.Shared;
 
-namespace Vasis.Erp.Facil.Data.Repositories.Interfaces
+namespace Vasis.Erp.Facil.Data.Repositories.Interfaces.Base
 {
     public interface IBaseRepository<T> where T : class
     {
@@ -10,6 +10,11 @@ namespace Vasis.Erp.Facil.Data.Repositories.Interfaces
         Task<T> UpdateAsync(T entity);
         Task DeleteAsync(Guid id);
         Task<List<T>> GetAllAsync();
-        Task<PagedResult<T>> GetPagedAsync(PagedRequestDto request, CancellationToken cancellationToken = default);
+
+        // 🔹 Atual (sem filtro)
+        Task<PagedResultDto<T>> GetPagedAsync(PagedRequestDto request);
+
+        // 🔹 Futuro (com expressão)
+        Task<PagedResultDto<T>> GetPagedAsync(Expression<Func<T, bool>> predicate, PagedRequestDto request);
     }
 }

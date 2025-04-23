@@ -48,7 +48,7 @@ public class EmpresaService : IEmpresaService
     public async Task<PagedResultDto<EmpresaDto>> GetPagedAsync(PagedRequestDto request)
     {
         // Paginação sem filtro (pode ajustar se quiser filtro por nome, CNPJ etc.)
-        var result = await _empresaRepository.GetPagedAsync(x => true, request);
+        var result = await _empresaRepository.GetPagedAsync(request);
         var dtoList = _mapper.Map<List<EmpresaDto>>(result.Items);
         return new PagedResultDto<EmpresaDto>(dtoList, result.TotalCount);
     }

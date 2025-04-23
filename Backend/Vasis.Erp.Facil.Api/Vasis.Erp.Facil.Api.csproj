@@ -12,6 +12,7 @@
     <Compile Remove="Controllers\PessoaController.cs" />
     <Compile Remove="Controllers\TransportadoraController.cs" />
     <Compile Remove="Controllers\WeatherForecastController.cs" />
+    <Compile Remove="WeatherForecast.cs" />
   </ItemGroup>
 
   <ItemGroup>

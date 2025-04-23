@@ -7,7 +7,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Services\EmpresaService.cs" />
+    <Compile Remove="Interfaces\IMotoristaService.cs" />
+    <Compile Remove="Interfaces\IPessoaService.cs" />
+    <Compile Remove="Interfaces\ITransportadoraService.cs" />
     <Compile Remove="Services\MotoristaService.cs" />
     <Compile Remove="Services\PessoaService.cs" />
     <Compile Remove="Services\TransportadoraService.cs" />
@@ -17,10 +19,6 @@
     <ProjectReference Include="..\..\Shared\Vasis.Erp.Facil.Shared.Dtos\Vasis.Erp.Facil.Shared.Dtos.csproj" />
     <ProjectReference Include="..\..\Shared\Vasis.Erp.Facil.Shared\Vasis.Erp.Facil.Shared.csproj" />
     <ProjectReference Include="..\Vasis.Erp.Facil.Data\Vasis.Erp.Facil.Data.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Services\" />
   </ItemGroup>
 
 </Project>
