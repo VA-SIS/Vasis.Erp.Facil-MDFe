@@ -7,7 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Repositories\Implementations\EmpresaRepository.cs" />
+    <Compile Remove="Repositories\Implementations\MotoristaRepository.cs" />
+    <Compile Remove="Repositories\Implementations\PessoaRepository.cs" />
     <Compile Remove="Repositories\Implementations\Repository.cs" />
+    <Compile Remove="Repositories\Implementations\TransportadoraRepository.cs" />
+    <Compile Remove="Repositories\Implementations\VeiculoRepository.cs" />
     <Compile Remove="Repositories\Interfaces\IRepository.cs" />
   </ItemGroup>
 

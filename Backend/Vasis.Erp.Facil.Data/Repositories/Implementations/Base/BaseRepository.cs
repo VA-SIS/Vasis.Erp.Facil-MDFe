@@ -1,8 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Vasis.Erp.Facil.Application.Dtos.Shared;
 using Vasis.Erp.Facil.Data.Context;
-using Vasis.Erp.Facil.Data.Repositories.Interfaces.Base;
 using System.Linq.Expressions;
+using Vasis.Erp.Facil.Data.Repositories.Interfaces;
+using Vasis.Erp.Facil.Shared.Dtos.Common;
 
 namespace Vasis.Erp.Facil.Data.Repositories.Implementations.Base
 {
@@ -77,6 +78,11 @@ namespace Vasis.Erp.Facil.Data.Repositories.Implementations.Base
                 .ToListAsync();
 
             return new PagedResultDto<T>(items, totalCount); // Retorna o resultado paginado
+        }
+
+        public Task<PagedResult<T>> GetPagedAsync(PagedRequestDto request, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
         }
     }
 }

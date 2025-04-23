@@ -12,7 +12,7 @@ public static class ServiceCollectionExtensions
         services.AddDbContext<ApplicationDbContext>(options =>
             options.UseSqlServer(connectionString));
 
-        services.AddScoped<IEmpresaRepository, EmpresaRepository>();
+        //services.AddScoped<IEmpresaRepository, EmpresaRepository>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
 
         return services;

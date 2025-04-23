@@ -2,10 +2,7 @@
 using Vasis.Erp.Facil.Application.Dtos.Shared;
 using Vasis.Erp.Facil.Data.Context;
 using Vasis.Erp.Facil.Data.Repositories.Interfaces;
-using Vasis.Erp.Facil.Data.Repositories.Interfaces.Base;
 using Vasis.Erp.Facil.Shared.Domain.Entities;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Vasis.Erp.Facil.Data.Repositories.Implementations.Base;
 
 namespace Vasis.Erp.Facil.Data.Repositories.Implementations
@@ -51,6 +48,7 @@ namespace Vasis.Erp.Facil.Data.Repositories.Implementations
             return await base.GetPagedAsync(predicate, request);
         }
 
+      
         public override async Task<Empresa> UpdateAsync(Empresa entity)
         {
             return await base.UpdateAsync(entity);
