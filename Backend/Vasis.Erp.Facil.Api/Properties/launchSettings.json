@@ -9,12 +9,12 @@
     }
   },
   "profiles": {
-    "http": {
+    "Vasis.Erp.Facil.Api": {
       "commandName": "Project",
       "dotnetRunMessages": true,
       "launchBrowser": true,
-      "launchUrl": "weatherforecast",
-      "applicationUrl": "http://localhost:5284",
+      "launchUrl": "swagger", // Abre direto no Swagger se estiver configurado
+      "applicationUrl": "http://localhost:5284;https://localhost:7284", // URLs para HTTP e HTTPS
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
@@ -22,7 +22,7 @@
     "IIS Express": {
       "commandName": "IISExpress",
       "launchBrowser": true,
-      "launchUrl": "weatherforecast",
+      "launchUrl": "swagger", // Para bater direto no Swagger
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
