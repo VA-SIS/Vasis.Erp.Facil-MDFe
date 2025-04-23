@@ -7,7 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Controllers\EmpresaController.cs" />
     <Compile Remove="Controllers\MotoristaController.cs" />
     <Compile Remove="Controllers\PessoaController.cs" />
     <Compile Remove="Controllers\TransportadoraController.cs" />
@@ -27,10 +26,6 @@
   <ItemGroup>
     <ProjectReference Include="..\Vasis.Erp.Facil.Application\Vasis.Erp.Facil.Application.csproj" />
     <ProjectReference Include="..\Vasis.Erp.Facil.Data\Vasis.Erp.Facil.Data.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Controllers\" />
   </ItemGroup>
 
 </Project>
