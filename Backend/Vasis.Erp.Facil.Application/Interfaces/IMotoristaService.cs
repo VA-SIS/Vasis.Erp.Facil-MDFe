@@ -1,7 +1,7 @@
-﻿using Vasis.Erp.Facil.Application.Dtos.Shared;
-using Vasis.Erp.Facil.Shared.Dtos.Cadastros;
+﻿using Vasis.Erp.Facil.Application.Dtos.Motorista;
+using Vasis.Erp.Facil.Application.Dtos.Shared;
 
-namespace Vasis.Erp.Facil.Application.Interfaces.Services
+namespace Vasis.Erp.Facil.Application.Services.Interfaces
 {
     public interface IMotoristaService
     {
@@ -10,5 +10,6 @@ namespace Vasis.Erp.Facil.Application.Interfaces.Services
         Task<MotoristaDto> CreateAsync(MotoristaDto dto);
         Task<MotoristaDto> UpdateAsync(Guid id, MotoristaDto dto);
         Task DeleteAsync(Guid id);
+        Task<List<MotoristaDto>> GetAllAsync();
     }
 }

@@ -1,11 +1,9 @@
-﻿// ITransportadoraRepository.cs
+﻿using Vasis.Erp.Facil.Data.Repositories.Interfaces.Base;
 using Vasis.Erp.Facil.Shared.Domain.Entities;
 
-public interface ITransportadoraRepository
+namespace Vasis.Erp.Facil.Data.Repositories.Interfaces
 {
-    Task<IEnumerable<Transportadora>> ListarAsync();
-    Task<Transportadora?> ObterPorIdAsync(Guid id);
-    Task AdicionarAsync(Transportadora transportadora);
-    Task AtualizarAsync(Transportadora transportadora);
-    Task RemoverAsync(Guid id);
+    public interface ITransportadoraRepository : IBaseRepository<Transportadora>
+    {
+    }
 }

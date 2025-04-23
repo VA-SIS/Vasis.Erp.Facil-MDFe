@@ -1,104 +1,66 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AutoMapper;
+using Vasis.Erp.Facil.Application.Dtos.Motorista;
 using Vasis.Erp.Facil.Application.Dtos.Shared;
-using Vasis.Erp.Facil.Application.Interfaces.Services;
-using Vasis.Erp.Facil.Data.Context;
+using Vasis.Erp.Facil.Application.Services.Interfaces;
+using Vasis.Erp.Facil.Domain.Repositories;
 using Vasis.Erp.Facil.Shared.Domain.Entities;
-using Vasis.Erp.Facil.Shared.Dtos.Cadastros;
 
-namespace Vasis.Erp.Facil.Application.Services
+namespace Vasis.Erp.Facil.Application.Services.Implementations
 {
     public class MotoristaService : IMotoristaService
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IMotoristaRepository _repository;
+        private readonly IMapper _mapper;
 
-        public MotoristaService(ApplicationDbContext context)
+        public MotoristaService(IMotoristaRepository repository, IMapper mapper)
         {
-            _context = context;
+            _repository = repository;
+            _mapper = mapper;
         }
 
         public async Task<PagedResultDto<MotoristaDto>> GetPagedAsync(PagedRequestDto request)
         {
-            if (request is null)
-                throw new ArgumentNullException(nameof(request));
+            var query = await _repository.GetPagedAsync(x =>
+                string.IsNullOrEmpty(request.Filter) || x.Nome!.Contains(request.Filter), request);
 
-            var query = _context.Motoristas.AsQueryable();
-
-            int total = await query.CountAsync();
-
-            var items = await query
-                .Skip(request.Skip)
-                .Take(request.Take)
-                .Select(m => new MotoristaDto
-                {
-                    Id = m.Id,
-                    Nome = m.Nome,
-                    NumeroCpf = m.NumeroCpf,
-                    NumeroCnh = m.NumeroCnh,
-                    CategoriaCnh = m.Categoria
-                })
-                .ToListAsync();
-
-            return new PagedResultDto<MotoristaDto>(items, total);
+            var items = _mapper.Map<List<MotoristaDto>>(query.Items);
+            return new PagedResultDto<MotoristaDto>
+            {
+                TotalCount = query.TotalCount,
+                Items = items
+            };
         }
 
         public async Task<MotoristaDto> GetByIdAsync(Guid id)
         {
-            var entity = await _context.Motoristas.FindAsync(id);
-
-            if (entity == null) return null;
-
-            return new MotoristaDto
-            {
-                Id = entity.Id,
-                Nome = entity.Nome,
-                NumeroCpf = entity.NumeroCpf,
-                NumeroCnh = entity.NumeroCnh,
-                CategoriaCnh = entity.CategoriaCnh
-            };
+            var entity = await _repository.GetByIdAsync(id);
+            return _mapper.Map<MotoristaDto>(entity);
         }
 
         public async Task<MotoristaDto> CreateAsync(MotoristaDto dto)
         {
-            var entity = new Motorista
-            {
-                Id = Guid.NewGuid(),
-                Nome = dto.Nome,
-                NumeroCpf = dto.NumeroCpf,
-                NumeroCnh = dto.NumeroCnh,
-                CategoriaCnh = dto.CategoriaCnh
-            };
-
-            _context.Motoristas.Add(entity);
-            await _context.SaveChangesAsync();
-
-            dto.Id = entity.Id;
-            return dto;
+            var entity = _mapper.Map<Motorista>(dto);
+            var result = await _repository.AddAsync(entity);
+            return _mapper.Map<MotoristaDto>(result);
         }
 
         public async Task<MotoristaDto> UpdateAsync(Guid id, MotoristaDto dto)
         {
-            var entity = await _context.Motoristas.FindAsync(id);
-            if (entity == null) return null;
-
-            entity.Nome = dto.Nome;
-            entity.NumeroCpf = dto.NumeroCpf;
-            entity.NumeroCnh = dto.NumeroCnh;
-            entity.CategoriaCnh = dto.CategoriaCnh;
-
-            _context.Motoristas.Update(entity);
-            await _context.SaveChangesAsync();
-
-            return dto;
+            var entity = await _repository.GetByIdAsync(id) ?? throw new Exception("Motorista não encontrado.");
+            _mapper.Map(dto, entity);
+            var updated = await _repository.UpdateAsync(entity);
+            return _mapper.Map<MotoristaDto>(updated);
         }
 
         public async Task DeleteAsync(Guid id)
         {
-            var entity = await _context.Motoristas.FindAsync(id);
-            if (entity != null)
-            {
-                _context.Motoristas.Remove(entity);
-                await _context.SaveChangesAsync();
-            }
+            await _repository.DeleteAsync(id);
+        }
+
+        public async Task<List<MotoristaDto>> GetAllAsync()
+        {
+            var result = await _repository.GetAllAsync();
+            return _mapper.Map<List<MotoristaDto>>(result);
         }
     }
 }

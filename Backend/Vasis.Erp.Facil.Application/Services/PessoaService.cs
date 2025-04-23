@@ -1,67 +1,96 @@
-﻿using AutoMapper;
-using Vasis.Erp.Facil.Application.Dtos.Shared;
-using Vasis.Erp.Facil.Application.Interfaces.Services;
-using Vasis.Erp.Facil.Data.Repositories.Interfaces;
+﻿using Vasis.Erp.Facil.Application.Dtos.Shared;
+using Vasis.Erp.Facil.Application.Services.Interfaces;
+using Vasis.Erp.Facil.Domain.Repositories;
 using Vasis.Erp.Facil.Shared.Domain.Entities;
 using Vasis.Erp.Facil.Shared.Dtos.Cadastros;
 
+namespace Vasis.Erp.Facil.Application.Services.Implementations;
+
 public class PessoaService : IPessoaService
 {
-    private readonly IPessoaRepository _repository;
-    private readonly IMapper _mapper;
+    private readonly IPessoaRepository _pessoaRepository;
 
-    public PessoaService(IPessoaRepository repository, IMapper mapper)
+    public PessoaService(IPessoaRepository pessoaRepository)
     {
-        _repository = repository;
-        _mapper = mapper;
-    }
-
-    public async Task<PessoaDto> GetByIdAsync(Guid id)
-    {
-        var entity = await _repository.GetByIdAsync(id);
-        return _mapper.Map<PessoaDto>(entity);
-    }
-
-    public async Task<PessoaDto> CreateAsync(PessoaDto dto)
-    {
-        var entity = _mapper.Map<Pessoa>(dto);
-        await _repository.AddAsync(entity);
-        return _mapper.Map<PessoaDto>(entity);
-    }
-
-    public async Task<PessoaDto> UpdateAsync(Guid id, PessoaDto dto)
-    {
-        var entity = await _repository.GetByIdAsync(id);
-        _mapper.Map(dto, entity);
-        await _repository.UpdateAsync(entity);
-        return _mapper.Map<PessoaDto>(entity);
-    }
-
-    public async Task DeleteAsync(Guid id)
-    {
-        await _repository.DeleteAsync(id);
+        _pessoaRepository = pessoaRepository;
     }
 
     public async Task<PagedResultDto<PessoaDto>> GetPagedAsync(PagedRequestDto request)
     {
-        var pessoas = await _repository.GetAllAsync();
+        var query = await _pessoaRepository.GetAllAsync();
 
-        var filtradas = string.IsNullOrWhiteSpace(request.Filter)
-            ? pessoas
-            : pessoas.Where(p =>
-                (!string.IsNullOrEmpty(p.Nome) && p.Nome.Contains(request.Filter, StringComparison.OrdinalIgnoreCase)) ||
-                (!string.IsNullOrEmpty(p.Documento) && p.Documento.Contains(request.Filter, StringComparison.OrdinalIgnoreCase))
-              ).ToList();
+        if (!string.IsNullOrWhiteSpace(request.Filter))
+        {
+            query = query
+                .Where(p => p.Nome.Contains(request.Filter, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+        }
 
-        var paginadas = filtradas
-            .Skip((request.PageNumber - 1) * request.PageSize)
+        var totalCount = query.Count;
+        var pagedItems = query
+            .Skip(request.SkipCount)
             .Take(request.PageSize)
+            .Select(p => new PessoaDto
+            {
+                Id = p.Id,
+                Nome = p.Nome,
+                CpfCnpj = p.CpfCnpj,
+                TipoPessoa = p.TipoPessoa
+            })
             .ToList();
 
-        return new PagedResultDto<PessoaDto>
+        return new PagedResultDto<PessoaDto>(pagedItems, totalCount);
+    }
+
+    public async Task<PessoaDto?> GetByIdAsync(Guid id)
+    {
+        var entity = await _pessoaRepository.GetByIdAsync(id);
+        if (entity == null) return null;
+
+        return new PessoaDto
         {
-            Items = paginadas.Select(_mapper.Map<PessoaDto>).ToList(),
-            TotalCount = filtradas.Count()
+            Id = entity.Id,
+            Nome = entity.Nome,
+            CpfCnpj = entity.CpfCnpj,
+            TipoPessoa = entity.TipoPessoa
         };
+    }
+
+    public async Task<PessoaDto> CreateAsync(PessoaDto dto)
+    {
+        var entity = new Pessoa
+        {
+            Id = Guid.NewGuid(),
+            Nome = dto.Nome,
+            CpfCnpj = dto.CpfCnpj,
+            TipoPessoa = dto.TipoPessoa
+        };
+
+        await _pessoaRepository.AddAsync(entity);
+
+        dto.Id = entity.Id;
+        return dto;
+    }
+
+    public async Task<PessoaDto?> UpdateAsync(PessoaDto dto)
+    {
+        var entity = await _pessoaRepository.GetByIdAsync(dto.Id);
+        if (entity == null) return null;
+
+        entity.Nome = dto.Nome;
+        entity.CpfCnpj = dto.CpfCnpj;
+        entity.TipoPessoa = dto.TipoPessoa;
+
+        await _pessoaRepository.UpdateAsync(entity);
+        return dto;
+    }
+
+    public async Task<bool> DeleteAsync(Guid id)
+    {
+        var entity = await _pessoaRepository.GetByIdAsync(id);
+        if (entity == null) return false;
+
+        await _pessoaRepository.DeleteAsync(id);
+        return true;
     }
 }
