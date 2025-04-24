@@ -1,59 +1,65 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using Vasis.Erp.Facil.Shared.Dtos.Common;
+using Vasis.Erp.Facil.Api.Settings;
 
-namespace Vasis.Erp.Facil.Api.Controllers;
-
-[ApiController]
-[Route("api/[controller]")]
-public class AuthController : ControllerBase
+namespace Vasis.Erp.Facil.Api.Controllers
 {
-    private readonly IConfiguration _configuration;
-
-    public AuthController(IConfiguration configuration)
+    [ApiController]
+    [Route("api/[controller]")]
+    public class AuthController : ControllerBase
     {
-        _configuration = configuration;
-    }
+        private readonly JwtSettings _jwtSettings;
 
-    [HttpPost("login")]
-    [AllowAnonymous]
-    public IActionResult Login([FromBody] LoginRequest model)
-    {
-        if (model.Email == "admin@vasis.com" && model.Senha == "Admin123!")
+        public AuthController(JwtSettings jwtSettings)
         {
-            var token = GerarToken(model.Email);
-            return Ok(new { token });
+            _jwtSettings = jwtSettings;
         }
 
-        return Unauthorized("Usuário ou senha inválidos.");
+        [HttpPost("login")]
+        public IActionResult Login([FromBody] LoginRequest model)
+        {
+            if (model.Email == "admin@vasis.com" && model.Senha == "Admin123!")
+            {
+                var token = GerarToken(model.Email);
+                return Ok(new { Token = token });
+            }
+
+            return Unauthorized("Usuário ou senha inválidos");
+        }
+
+        private string GerarToken(string email)
+        {
+            var key = Encoding.ASCII.GetBytes(_jwtSettings.Secret);
+            var claims = new[]
+            {
+                new Claim(ClaimTypes.Name, email),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+            };
+
+            var credentials = new SigningCredentials(
+                new SymmetricSecurityKey(key),
+                SecurityAlgorithms.HmacSha256
+            );
+
+            var token = new JwtSecurityToken(
+                issuer: _jwtSettings.Issuer,
+                audience: _jwtSettings.Audience,
+                claims: claims,
+                expires: DateTime.UtcNow.AddHours(_jwtSettings.ExpireHours),
+                signingCredentials: credentials
+            );
+
+            return new JwtSecurityTokenHandler().WriteToken(token);
+        }
     }
 
-    private string GerarToken(string email)
+    public class LoginRequest
     {
-        var key = Encoding.UTF8.GetBytes(_configuration["Jwt:Key"] ?? "ChaveSuperSecreta123!");
-        var issuer = _configuration["Jwt:Issuer"] ?? "Vasis.Erp.Facil";
-
-        var claims = new[]
-        {
-            new Claim(ClaimTypes.Name, email),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-        };
-
-        var credentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256);
-
-        var token = new JwtSecurityToken(
-            issuer: issuer,
-            audience: issuer,
-            claims: claims,
-            expires: DateTime.UtcNow.AddHours(1),
-            signingCredentials: credentials
-        );
-
-        return new JwtSecurityTokenHandler().WriteToken(token);
+        public string Email { get; set; } = string.Empty;
+        public string Senha { get; set; } = string.Empty;
     }
 }
-
