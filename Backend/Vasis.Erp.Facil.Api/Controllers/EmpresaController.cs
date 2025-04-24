@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Vasis.Erp.Facil.Application.Dtos.Cadastros;
 using Vasis.Erp.Facil.Application.Dtos.Shared;
 using Vasis.Erp.Facil.Application.Interfaces.Services;
@@ -7,6 +8,7 @@ namespace Vasis.Erp.Facil.Api.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class EmpresaController : ControllerBase
     {
         private readonly IEmpresaService _empresaService;
