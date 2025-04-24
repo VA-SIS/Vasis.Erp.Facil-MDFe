@@ -2,6 +2,9 @@
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
+
+    <PreserveCompilationContext>true</PreserveCompilationContext>
+
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
 
@@ -38,4 +41,5 @@
     <ProjectReference Include="..\..\Shared\Vasis.Erp.Facil.Shared\Vasis.Erp.Facil.Shared.csproj" />
   </ItemGroup>
 
+  
 </Project>

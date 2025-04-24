@@ -1,57 +1,20 @@
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+Ôªøusing Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System.Text.Json;
 using Vasis.Erp.Facil.Api.Settings;
-
+using Vasis.Erp.Facil.Backend.Data;
+using Vasis.Erp.Facil.Backend.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ConfiguraÁ„o do JWT
-var jwtKey = builder.Configuration["Jwt:Key"] ?? "ChaveSuperSecreta123!";
-var jwtIssuer = builder.Configuration["Jwt:Issuer"] ?? "Vasis.Erp.Facil";
-
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
-    {
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true,
-            ValidIssuer = jwtIssuer,
-            ValidAudience = jwtIssuer,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
-        };
-    });
-
-// CORS din‚mico com base no ambiente
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("DevelopmentCors", policy =>
-    {
-        policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
-    });
-
-    options.AddPolicy("ProductionCors", policy =>
-    {
-        policy.WithOrigins("http://erp.meufacil.com", "http://dfe.meufacil.com")
-              .AllowAnyMethod()
-              .AllowAnyHeader();
-    });
-});
-
+// --- CONFIGURA√á√ïES JWT ---
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
-builder.Services.AddSingleton(sp =>
-    sp.GetRequiredService<IOptions<JwtSettings>>().Value);
+builder.Services.AddSingleton(sp => sp.GetRequiredService<IOptions<JwtSettings>>().Value);
 
-builder.Services.AddControllers();
-
-// Bind JwtSettings
-var jwtSettingsSection = builder.Configuration.GetSection("JwtSettings");
-var jwtSettings = jwtSettingsSection.Get<JwtSettings>();
+// JWT Settings carregado do appsettings
+var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>() ?? new JwtSettings();
 
 builder.Services.AddAuthentication(options =>
 {
@@ -60,46 +23,47 @@ builder.Services.AddAuthentication(options =>
 })
 .AddJwtBearer(options =>
 {
-    options.RequireHttpsMetadata = false; // true em produÁ„o com HTTPS
+    options.RequireHttpsMetadata = false; // ative em produ√ß√£o
     options.SaveToken = true;
     options.TokenValidationParameters = new TokenValidationParameters
     {
-        ValidateIssuerSigningKey = true,
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(jwtSettings.Secret)),
         ValidateIssuer = true,
         ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
         ValidIssuer = jwtSettings.Issuer,
         ValidAudience = jwtSettings.Audience,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Secret)),
         ClockSkew = TimeSpan.Zero
     };
 });
 
+// --- CORS ---
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("DevelopmentCors", policy =>
+        policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
 
+    options.AddPolicy("ProductionCors", policy =>
+        policy.WithOrigins("http://erp.meufacil.com", "http://dfe.meufacil.com")
+              .AllowAnyMethod()
+              .AllowAnyHeader());
+});
+
+// --- CONTROLLERS & SWAGGER ---
+builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("Jwt"));
+builder.Services.AddScoped<TokenService>();
+
+
+
+
 var app = builder.Build();
 
-// Aplica CORS conforme o ambiente
-if (app.Environment.IsDevelopment())
-    app.UseCors("DevelopmentCors");
-else
-    app.UseCors("ProductionCors");
-
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
-
-app.UseHttpsRedirection();
-
-// AutenticaÁ„o e autorizaÁ„o
-app.UseAuthentication();
-app.UseAuthorization();
-
-app.MapControllers();
-
+// --- GLOBAL EXCEPTION HANDLER ---
 app.Use(async (context, next) =>
 {
     try
@@ -115,11 +79,35 @@ app.Use(async (context, next) =>
         context.Response.ContentType = "application/json";
         await context.Response.WriteAsync(JsonSerializer.Serialize(new
         {
-            erro = "Ocorreu um erro inesperado. Nossa equipe j· foi notificada."
+            erro = "Ocorreu um erro inesperado. Nossa equipe j√° foi notificada."
         }));
     }
 });
 
+// --- MIDDLEWARES ---
+if (app.Environment.IsDevelopment())
+{
+    app.UseCors("DevelopmentCors");
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+else
+{
+    app.UseCors("ProductionCors");
+}
 
+app.UseHttpsRedirection();
+
+app.UseAuthentication();
+app.UseAuthorization();
+
+app.MapControllers();
+
+SeedData.EnsureSeedData(app.Services);
 
 app.Run();
+
+// MANTENHA TODO O C√ìDIGO ATUAL DO Program.cs COMO EST√Å
+
+// üëá Adicione esta linha no final do arquivo:
+public partial class Program { }

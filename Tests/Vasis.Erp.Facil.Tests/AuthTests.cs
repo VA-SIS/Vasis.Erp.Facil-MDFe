@@ -1,16 +1,17 @@
 ﻿using FluentAssertions;
-using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.VisualStudio.TestPlatform.TestHost;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Net;
 using System.Text.Json;
+using Vasis.Erp.Facil.Tests.Infrastructure; // <- aqui importa a factory customizada
 
-public class AuthTests : IClassFixture<WebApplicationFactory<Program>>
+namespace Vasis.Erp.Facil.Tests.Services;
+
+public class AuthTests : IClassFixture<CustomWebApplicationFactory>
 {
     private readonly HttpClient _client;
 
-    public AuthTests(WebApplicationFactory<Program> factory)
+    public AuthTests(CustomWebApplicationFactory factory)
     {
         _client = factory.CreateClient();
     }
@@ -23,7 +24,7 @@ public class AuthTests : IClassFixture<WebApplicationFactory<Program>>
     }
 
     [Fact]
-    public async Task RotaProtegida_ComToken_DeveRetornar200()
+    public async Task RotaProtegida_ComTokenValido_DeveRetornar200()
     {
         var loginResponse = await _client.PostAsJsonAsync("/api/auth/login", new
         {
@@ -31,12 +32,31 @@ public class AuthTests : IClassFixture<WebApplicationFactory<Program>>
             senha = "Admin123!"
         });
 
+       
+
+        loginResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+
         var content = await loginResponse.Content.ReadFromJsonAsync<JsonElement>();
-        var token = content.GetProperty("token").GetString();
+        content.TryGetProperty("token", out var tokenElement).Should().BeTrue();
+
+        var token = tokenElement.GetString();
+        token.Should().NotBeNullOrWhiteSpace();
 
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-
         var response = await _client.GetAsync("/api/sistema/segredo");
         response.StatusCode.Should().Be(HttpStatusCode.OK);
+    }
+
+    [Fact]
+    public async Task Login_ComCredenciaisInvalidas_DeveRetornar401()
+    {
+        var loginData = new
+        {
+            email = "admin@vasis.com",
+            senha = "senhaErrada"
+        };
+
+        var response = await _client.PostAsJsonAsync("/api/auth/login", loginData);
+        response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
     }
 }
