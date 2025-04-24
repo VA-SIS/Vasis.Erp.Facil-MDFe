@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
@@ -14,6 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="14.0.0" />
     <PackageReference Include="FluentAssertions" Version="6.12.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="8.0.15" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
@@ -31,6 +32,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Backend\Vasis.Erp.Facil.Api\Vasis.Erp.Facil.Api.csproj" />
+    <ProjectReference Include="..\..\Backend\Vasis.Erp.Facil.Application\Vasis.Erp.Facil.Application.csproj" />
+    <ProjectReference Include="..\..\Backend\Vasis.Erp.Facil.Data\Vasis.Erp.Facil.Data.csproj" />
+    <ProjectReference Include="..\..\Shared\Vasis.Erp.Facil.Shared.Dtos\Vasis.Erp.Facil.Shared.Dtos.csproj" />
+    <ProjectReference Include="..\..\Shared\Vasis.Erp.Facil.Shared\Vasis.Erp.Facil.Shared.csproj" />
   </ItemGroup>
 
 </Project>

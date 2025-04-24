@@ -2,71 +2,89 @@
 // Arquivo: Services/EmpresaServiceTests.cs
 using Moq;
 using FluentAssertions;
-using FluentValidation;
-using Vasis.Erp.Facil.Application.Validators;
+using AutoMapper;
+using Vasis.Erp.Facil.Application.Dtos.Cadastros;
+using Vasis.Erp.Facil.Shared.Domain.Entities;
 using Vasis.Erp.Facil.Application.Services.Implementations;
 using Vasis.Erp.Facil.Data.Repositories.Interfaces;
-using Vasis.Erp.Facil.Shared.Domain.Entities;
-using Vasis.Erp.Facil.Application.Dtos.Cadastros;
+using Vasis.Erp.Facil.Shared.Dtos.Profiles;
 
 namespace Vasis.Erp.Facil.Tests.Services
 {
     public class EmpresaServiceTests
     {
         private readonly Mock<IEmpresaRepository> _repoMock;
-        private readonly IValidator<Empresa> _validator;
+        private readonly IMapper _mapper;
         private readonly EmpresaService _service;
 
         public EmpresaServiceTests()
         {
             _repoMock = new Mock<IEmpresaRepository>();
-            _validator = new EmpresaValidator();
-            _service = new EmpresaService(_repoMock.Object, _validator);
+
+            var config = new MapperConfiguration(cfg =>
+            {
+                cfg.AddProfile<EmpresaProfile>();
+            });
+            _mapper = config.CreateMapper();
+
+            _service = new EmpresaService(_repoMock.Object, _mapper);
         }
 
         [Fact]
-        public async Task CriarEmpresa_DeveCriarComSucesso_QuandoDadosForemValidos()
+        public async Task CreateAsync_DeveRetornarEmpresaCriada_QuandoDadosValidos()
         {
-            var empresa = new EmpresaDto { NomeFantasia = "Empresa Teste", Cnpj = "12345678000199" };
-            _repoMock.Setup(r => r.AddAsync(It.IsAny<Empresa>())).ReturnsAsync(Empresa);
+            // Arrange
+            var dto = new EmpresaDto
+            {
+                Cnpj = "12345678000199",
+                RazaoSocial = "Empresa Teste",
+                NomeFantasia = "Fantasia Teste"
+            };
 
-            var resultado = await _service.CreateAsync(empresa);
+            var empresaCriada = _mapper.Map<Empresa>(dto);
+            _repoMock.Setup(r => r.AddAsync(It.IsAny<Empresa>())).ReturnsAsync(empresaCriada);
 
+            // Act
+            var resultado = await _service.CreateAsync(dto);
+
+            // Assert
             resultado.Should().NotBeNull();
-            resultado.NomeFantasia.Should().Be("Empresa Teste");
+            resultado.RazaoSocial.Should().Be("Empresa Teste");
         }
 
         [Fact]
-        public async Task CriarEmpresa_DeveLancarExcecao_QuandoDadosInvalidos()
+        public async Task UpdateAsync_DeveRetornarEmpresaAtualizada_QuandoDadosValidos()
         {
-            EmpresaDto empresa = new EmpresaDto { NomeFantasia = "", Cnpj = "000" };
-            Func<Task> act = async () => await _service.CreateAsync(empresa);
+            // Arrange
+            var dto = new EmpresaDto
+            {
+                Id = Guid.NewGuid(),
+                Cnpj = "12345678000199",
+                RazaoSocial = "Empresa Atualizada",
+                NomeFantasia = "Fantasia Atualizada"
+            };
 
-            await act.Should().ThrowAsync<ValidationException>();
+            var empresaAtualizada = _mapper.Map<Empresa>(dto);
+            _repoMock.Setup(r => r.UpdateAsync(It.IsAny<Empresa>())).ReturnsAsync(empresaAtualizada);
+
+            // Act
+            var resultado = await _service.UpdateAsync(dto);
+
+            // Assert
+            resultado.Should().NotBeNull();
+            resultado.RazaoSocial.Should().Be("Empresa Atualizada");
         }
 
         [Fact]
-        public async Task AtualizarEmpresa_DeveAtualizarComSucesso_QuandoValido()
+        public async Task DeleteAsync_DeveExecutarSemExcecao_QuandoIdValido()
         {
-            EmpresaDto empresa = new EmpresaDto { Id = Guid.NewGuid(), NomeFantasia = "Atualizada", Cnpj = "12345678000199" };
-            _repoMock.Setup(r => r.UpdateAsync(empresa)).ReturnsAsync(empresa);
+            // Arrange
+            var id = Guid.NewGuid();
+            _repoMock.Setup(r => r.DeleteAsync(id)).Returns(Task.CompletedTask);
 
-            var resultado = await _service.UpdateAsync(empresa);
-
-            resultado.NomeFantasia.Should().Be("Atualizada");
-        }
-
-        [Fact]
-        public async Task RemoverEmpresa_DeveRetornarFalse_SeEmpresaNaoExistir()
-        {
-            bool resultado = true;
-            Guid id = Guid.NewGuid();
-
-            //_repoMock.Setup(r => r.DeleteAsync(id)).ReturnsAsync(false);
-
-            //var resultado = await _service.DeleteAsync(id);
-
-            resultado.Should().BeFalse();
+            // Act & Assert
+            var exception = await Record.ExceptionAsync(() => _service.DeleteAsync(id));
+            exception.Should().BeNull();
         }
     }
 }
