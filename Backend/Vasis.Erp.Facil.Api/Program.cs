@@ -1,22 +1,23 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System.Text.Json;
 using Vasis.Erp.Facil.Api.Infrastructure;
-using Vasis.Erp.Facil.Api.Settings;
 using Vasis.Erp.Facil.Application.Services;
+using Vasis.Erp.Facil.Data.Context;
+using Vasis.Erp.Facil.Shared.Settings;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// --- CONFIGURAÇÕES JWT ---
+// Configuração JwtSettings
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
-builder.Services.AddSingleton(sp => sp.GetRequiredService<IOptions<JwtSettings>>().Value);
-builder.Services.AddScoped<SeedData>();
+builder.Services.AddSingleton(sp =>
+    sp.GetRequiredService<IOptions<JwtSettings>>().Value);
 
-
-// JWT Settings carregado do appsettings
-var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>() ?? new JwtSettings();
+// Obter instância JwtSettings
+var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>()!;
 
 builder.Services.AddAuthentication(options =>
 {
@@ -25,7 +26,7 @@ builder.Services.AddAuthentication(options =>
 })
 .AddJwtBearer(options =>
 {
-    options.RequireHttpsMetadata = false; // ative em produção
+    options.RequireHttpsMetadata = false;
     options.SaveToken = true;
     options.TokenValidationParameters = new TokenValidationParameters
     {
@@ -40,7 +41,6 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-// --- CORS ---
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("DevelopmentCors", policy =>
@@ -52,20 +52,18 @@ builder.Services.AddCors(options =>
               .AllowAnyHeader());
 });
 
-// --- CONTROLLERS & SWAGGER ---
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("Jwt"));
 builder.Services.AddScoped<TokenService>();
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-
-
+builder.Services.AddScoped<SeedData>();
 
 var app = builder.Build();
 
-// --- GLOBAL EXCEPTION HANDLER ---
 app.Use(async (context, next) =>
 {
     try
@@ -76,7 +74,6 @@ app.Use(async (context, next) =>
     {
         var logger = context.RequestServices.GetRequiredService<ILogger<Program>>();
         logger.LogError(ex, "Erro inesperado.");
-
         context.Response.StatusCode = 500;
         context.Response.ContentType = "application/json";
         await context.Response.WriteAsync(JsonSerializer.Serialize(new
@@ -86,7 +83,6 @@ app.Use(async (context, next) =>
     }
 });
 
-// --- MIDDLEWARES ---
 if (app.Environment.IsDevelopment())
 {
     app.UseCors("DevelopmentCors");
@@ -99,23 +95,16 @@ else
 }
 
 app.UseHttpsRedirection();
-
 app.UseAuthentication();
 app.UseAuthorization();
-
 app.MapControllers();
-
-
 
 using (var scope = app.Services.CreateScope())
 {
     var seeder = scope.ServiceProvider.GetRequiredService<SeedData>();
-    seeder.EnsureSeeded();
+    seeder.Populate();
 }
 
 app.Run();
 
-// MANTENHA TODO O CÓDIGO ATUAL DO Program.cs COMO ESTÁ
-
-// 👇 Adicione esta linha no final do arquivo:
 public partial class Program { }

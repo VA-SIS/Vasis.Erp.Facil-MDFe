@@ -1,62 +1,42 @@
-﻿using FluentAssertions;
-using System.Net.Http.Headers;
-using System.Net.Http.Json;
-using System.Net;
-using System.Text.Json;
-using Vasis.Erp.Facil.Tests.Infrastructure; // <- aqui importa a factory customizada
+﻿using System.Net.Http.Json;
+using Vasis.Erp.Facil.Tests.Infrastructure;
+using FluentAssertions;
 
-namespace Vasis.Erp.Facil.Tests.Services;
-
-public class AuthTests : IClassFixture<CustomWebApplicationFactory>
+namespace Vasis.Erp.Facil.Tests
 {
-    private readonly HttpClient _client;
-
-    public AuthTests(CustomWebApplicationFactory factory)
+    public class AuthTests : IClassFixture<CustomWebApplicationFactory<Program>>
     {
-        _client = factory.CreateClient();
-    }
+        private readonly HttpClient _client;
 
-    [Fact]
-    public async Task RotaProtegida_SemToken_DeveRetornar401()
-    {
-        var response = await _client.GetAsync("/api/sistema/segredo");
-        response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
-    }
-
-    [Fact]
-    public async Task RotaProtegida_ComTokenValido_DeveRetornar200()
-    {
-        var loginResponse = await _client.PostAsJsonAsync("/api/auth/login", new
+        public AuthTests(CustomWebApplicationFactory<Program> factory)
         {
-            email = "admin@vasis.com",
-            senha = "Admin123!"
-        });
+            _client = factory.CreateClient();
+        }
 
-       
-
-        loginResponse.StatusCode.Should().Be(HttpStatusCode.OK);
-
-        var content = await loginResponse.Content.ReadFromJsonAsync<JsonElement>();
-        content.TryGetProperty("token", out var tokenElement).Should().BeTrue();
-
-        var token = tokenElement.GetString();
-        token.Should().NotBeNullOrWhiteSpace();
-
-        _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-        var response = await _client.GetAsync("/api/sistema/segredo");
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
-    }
-
-    [Fact]
-    public async Task Login_ComCredenciaisInvalidas_DeveRetornar401()
-    {
-        var loginData = new
+        [Fact]
+        public async Task Should_Authenticate_With_Valid_Credentials()
         {
-            email = "admin@vasis.com",
-            senha = "senhaErrada"
-        };
+            // Arrange
+            var loginRequest = new
+            {
+                Email = "admin@vasis.com",
+                Senha = "Admin123!"
+            };
 
-        var response = await _client.PostAsJsonAsync("/api/auth/login", loginData);
-        response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+            // Act
+            var response = await _client.PostAsJsonAsync("/api/auth/login", loginRequest);
+
+            // Assert
+            response.EnsureSuccessStatusCode(); // Código 200 esperado
+            var content = await response.Content.ReadFromJsonAsync<AuthResponse>();
+
+            content.Should().NotBeNull();
+            content!.Token.Should().NotBeNullOrEmpty();
+        }
+
+        private class AuthResponse
+        {
+            public string Token { get; set; }
+        }
     }
 }

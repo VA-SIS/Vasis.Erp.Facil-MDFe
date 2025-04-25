@@ -1,7 +1,8 @@
-﻿namespace Vasis.Erp.Facil.Shared.DTOs.Auth;
-
-public class LoginRequest
+﻿namespace Vasis.Erp.Facil.Shared.DTOs.Auth
 {
-    public string Email { get; set; } = string.Empty;
-    public string Senha { get; set; } = string.Empty;
+    public class LoginRequest
+    {
+        public string Email { get; set; } = string.Empty;
+        public string Senha { get; set; } = string.Empty;
+    }
 }
