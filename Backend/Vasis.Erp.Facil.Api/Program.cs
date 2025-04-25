@@ -3,15 +3,17 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System.Text.Json;
+using Vasis.Erp.Facil.Api.Infrastructure;
 using Vasis.Erp.Facil.Api.Settings;
-using Vasis.Erp.Facil.Backend.Data;
-using Vasis.Erp.Facil.Backend.Services;
+using Vasis.Erp.Facil.Application.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // --- CONFIGURAÇÕES JWT ---
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
 builder.Services.AddSingleton(sp => sp.GetRequiredService<IOptions<JwtSettings>>().Value);
+builder.Services.AddScoped<SeedData>();
+
 
 // JWT Settings carregado do appsettings
 var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>() ?? new JwtSettings();
@@ -103,7 +105,13 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-SeedData.EnsureSeedData(app.Services);
+
+
+using (var scope = app.Services.CreateScope())
+{
+    var seeder = scope.ServiceProvider.GetRequiredService<SeedData>();
+    seeder.EnsureSeeded();
+}
 
 app.Run();
 

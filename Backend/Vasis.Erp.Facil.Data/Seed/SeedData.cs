@@ -1,29 +1,29 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Vasis.Erp.Facil.Shared.Entities;
+using Vasis.Erp.Facil.Data.Context;
 
-namespace Vasis.Erp.Facil.Backend.Data
+namespace Vasis.Erp.Facil.Api.Infrastructure;
+
+public class SeedData
 {
-    public static class SeedData
+    private readonly ApplicationDbContext _context;
+
+    public SeedData(ApplicationDbContext context)
     {
-        public static void EnsureSeedData(IServiceProvider services)
+        _context = context;
+    }
+
+    public void EnsureSeeded()
+    {
+        if (!_context.Usuarios.Any())
         {
-            using var scope = services.CreateScope();
-            var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-
-            if (!context.Usuarios.Any(u => u.Email == "admin@vasis.com"))
+            _context.Usuarios.Add(new Usuario
             {
-                var admin = new Usuario
-                {
-                    Nome = "Administrador",
-                    Email = "admin@vasis.com",
-                    SenhaHash = BCrypt.Net.BCrypt.HashPassword("Admin123!"),
-                    CriadoEm = DateTime.UtcNow,
-                    Ativo = true,
-                    // preencha outros campos obrigatórios se houver
-                };
+                Nome = "Administrador",
+                Email = "admin@vasis.com",
+                Senha = BCrypt.Net.BCrypt.HashPassword("Admin123!")
+            });
 
-                context.Usuarios.Add(admin);
-                context.SaveChanges();
-            }
+            _context.SaveChanges();
         }
     }
 }

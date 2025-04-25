@@ -1,8 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
-using Vasis.Erp.Facil.Api.Settings;
-using Vasis.Erp.Facil.Backend.Services;
-using Vasis.Erp.Facil.Shared.Models;
+using Vasis.Erp.Facil.Application.Services;
+using Vasis.Erp.Facil.Shared.DTOs.Auth;
+using Vasis.Erp.Facil.Shared.Entities;
 
 namespace Vasis.Erp.Facil.Api.Controllers;
 
@@ -22,7 +21,13 @@ public class AuthController : ControllerBase
     {
         if (model.Email == "admin@vasis.com" && model.Senha == "Admin123!")
         {
-            var token = _tokenService.GenerateToken(model.Email);
+            var usuario = new Usuario
+            {
+                Id = Guid.Empty, // ou um Guid se for string
+                Email = model.Email
+            };
+
+            var token = _tokenService.GerarToken(usuario);
             return Ok(new { token });
         }
 

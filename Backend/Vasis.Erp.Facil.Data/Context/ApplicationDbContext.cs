@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Vasis.Erp.Facil.Backend.Data.Mappings;
+using Vasis.Erp.Facil.Data.Mappings;
 using Vasis.Erp.Facil.Shared.Domain.Entities;
 using Vasis.Erp.Facil.Shared.Entities;
 

@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using Vasis.Erp.Facil.Shared.DTOs.Auth;
 
 namespace Vasis.Erp.Facil.Shared.Validators;
 

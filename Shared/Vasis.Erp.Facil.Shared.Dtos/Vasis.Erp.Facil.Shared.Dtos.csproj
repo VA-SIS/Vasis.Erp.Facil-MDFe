@@ -11,4 +11,8 @@
     <PackageReference Include="JWT" Version="11.0.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Vasis.Erp.Facil.Shared\Vasis.Erp.Facil.Shared.csproj" />
+  </ItemGroup>
+
 </Project>
