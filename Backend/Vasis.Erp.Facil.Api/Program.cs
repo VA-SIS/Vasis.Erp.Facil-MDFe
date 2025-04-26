@@ -64,24 +64,24 @@ builder.Services.AddScoped<SeedData>();
 
 var app = builder.Build();
 
-app.Use(async (context, next) =>
-{
-    try
-    {
-        await next();
-    }
-    catch (Exception ex)
-    {
-        var logger = context.RequestServices.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "Erro inesperado.");
-        context.Response.StatusCode = 500;
-        context.Response.ContentType = "application/json";
-        await context.Response.WriteAsync(JsonSerializer.Serialize(new
-        {
-            erro = "Ocorreu um erro inesperado. Nossa equipe já foi notificada."
-        }));
-    }
-});
+//app.Use(async (context, next) =>
+//{
+//    try
+//    {
+//        await next();
+//    }
+//    catch (Exception ex)
+//    {
+//        var logger = context.RequestServices.GetRequiredService<ILogger<Program>>();
+//        logger.LogError(ex, "Erro inesperado.");
+//        context.Response.StatusCode = 500;
+//        context.Response.ContentType = "application/json";
+//        await context.Response.WriteAsync(JsonSerializer.Serialize(new
+//        {
+//            erro = "Ocorreu um erro inesperado. Nossa equipe já foi notificada."
+//        }));
+//    }
+//});
 
 if (app.Environment.IsDevelopment())
 {
