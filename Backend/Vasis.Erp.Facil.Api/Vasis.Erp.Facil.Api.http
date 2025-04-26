@@ -1,6 +1,31 @@
-@Vasis.Erp.Facil.Api_HostAddress = http://localhost:5284
+### 🔐 Login e obter token
+POST http://localhost:54019/api/auth/login
+Content-Type: application/json
 
-GET {{Vasis.Erp.Facil.Api_HostAddress}}/weatherforecast/
+{
+  "email": "admin@vasis.com",
+  "senha": "Admin123!"
+}
+
+###
+
+### 📄 Buscar empresas paginadas (precisa do token)
+GET http://localhost:54019/api/empresa/paged
+Authorization: Bearer {{jwtToken}}
 Accept: application/json
+
+###
+
+### 🏢 Criar nova empresa (ajuste se necessário)
+POST http://localhost:54019/api/empresa
+Authorization: Bearer {{jwtToken}}
+Content-Type: application/json
+
+{
+  "nome": "Empresa Teste LTDA",
+  "cnpj": "12345678000199",
+  "inscricaoEstadual": "ISENTO",
+  "telefone": "(67) 99999-9999"
+}
 
 ###

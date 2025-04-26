@@ -1,0 +1,30 @@
+﻿@page "/empresas"
+@using Vasis.Erp.Facil.Application.Dtos.Cadastros
+@using Vasis.Erp.Facil.Frontend.Facil.Client.Services
+@inject EmpresaService EmpresaService
+
+<PageTitle>Empresas</PageTitle>
+
+<MudPaper Class="pa-4">
+    <MudText Typo="Typo.h5">Empresas Cadastradas</MudText>
+
+    <MudTable Items="_empresas" Dense="true" Hover="true">
+        <HeaderContent>
+            <MudTh>Nome Fantasia</MudTh>
+            <MudTh>CNPJ</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd>@context.NomeFantasia</MudTd>
+            <MudTd>@context.Cnpj</MudTd>
+        </RowTemplate>
+    </MudTable>
+</MudPaper>
+
+@code {
+    private List<EmpresaDto> _empresas = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        _empresas = await EmpresaService.ListarAsync();
+    }
+}
