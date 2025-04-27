@@ -1,6 +1,7 @@
 ﻿using System.Net.Http.Json;
 using Vasis.Erp.Facil.Tests.Infrastructure;
 using FluentAssertions;
+using Microsoft.VisualStudio.TestPlatform.TestHost;
 
 namespace Vasis.Erp.Facil.Tests
 {

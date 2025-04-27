@@ -1,23 +1,31 @@
 ﻿@page "/empresas"
 @using Vasis.Erp.Facil.Application.Dtos.Cadastros
 @using Vasis.Erp.Facil.Frontend.Facil.Client.Services
+
 @inject EmpresaService EmpresaService
+@inject IDialogService DialogService
 
 <PageTitle>Empresas</PageTitle>
 
 <MudPaper Class="pa-4">
-    <MudText Typo="Typo.h5">Empresas Cadastradas</MudText>
+    <MudStack Spacing="2">
+        <MudText Typo="Typo.h5">Lista de Empresas</MudText>
 
-    <MudTable Items="_empresas" Dense="true" Hover="true">
-        <HeaderContent>
-            <MudTh>Nome Fantasia</MudTh>
-            <MudTh>CNPJ</MudTh>
-        </HeaderContent>
-        <RowTemplate>
-            <MudTd>@context.NomeFantasia</MudTd>
-            <MudTd>@context.Cnpj</MudTd>
-        </RowTemplate>
-    </MudTable>
+        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="NovaEmpresa" StartIcon="@Icons.Material.Filled.Add">
+            Nova Empresa
+        </MudButton>
+
+        <MudTable Items="_empresas" Dense="true" Hover="true">
+            <HeaderContent>
+                <MudTh>Nome Fantasia</MudTh>
+                <MudTh>CNPJ</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd>@context.NomeFantasia</MudTd>
+                <MudTd>@context.Cnpj</MudTd>
+            </RowTemplate>
+        </MudTable>
+    </MudStack>
 </MudPaper>
 
 @code {
@@ -26,5 +34,18 @@
     protected override async Task OnInitializedAsync()
     {
         _empresas = await EmpresaService.ListarAsync();
+    }
+
+    private async Task NovaEmpresa()
+    {
+        var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small, FullWidth = true };
+        var dialog = DialogService.Show<EmpresaFormDialog>("Nova Empresa", options);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            _empresas = await EmpresaService.ListarAsync();
+            StateHasChanged();
+        }
     }
 }
