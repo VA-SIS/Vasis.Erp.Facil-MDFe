@@ -5,12 +5,16 @@ using Microsoft.OpenApi.Models;
 using System.Text;
 using Vasis.Erp.Facil.Data.Context;
 using Vasis.Erp.Facil.Data.Seed;
+using Vasis.Erp.Facil.Application.Services; // Adicionar TokenService se necessário
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Configurar DbContext
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// 👇 REGISTRAR CONTROLADORES - ISSO QUE FALTAVA
+builder.Services.AddControllers();
 
 // Configurar Autenticação JWT
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -31,9 +35,10 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 // Configurar Autorização
 builder.Services.AddAuthorization();
 
-// Adicionar Razor Pages e Blazor
+// Adicionar serviços necessários
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
+builder.Services.AddScoped<TokenService>(); // 👈 Adicionar o TokenService
 
 // Configurar Swagger
 builder.Services.AddEndpointsApiExplorer();
@@ -41,7 +46,6 @@ builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "Vasis.Facil.Erp API", Version = "v1" });
 
-    // Configurar autenticação no Swagger
     var securityScheme = new OpenApiSecurityScheme
     {
         Name = "Authorization",
@@ -95,7 +99,6 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
 
-// Ativar autenticação e autorização
 app.UseAuthentication();
 app.UseAuthorization();
 

@@ -1,36 +1,40 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Vasis.Erp.Facil.Data.Context;
 using Vasis.Erp.Facil.Application.Services;
 using Vasis.Erp.Facil.Shared.DTOs.Auth;
-using Vasis.Erp.Facil.Shared.Entities;
 
-namespace Vasis.Erp.Facil.Api.Controllers;
-
-[ApiController]
-[Route("api/auth")]
-public class AuthController : ControllerBase
+namespace Vasis.Erp.Facil.Api.Controllers
 {
-    private readonly TokenService _tokenService;
-
-    public AuthController(TokenService tokenService)
+    [ApiController]
+    [Route("api/[controller]")]
+    public class AuthController : ControllerBase
     {
-        _tokenService = tokenService;
-    }
+        private readonly ApplicationDbContext _dbContext;
+        private readonly TokenService _tokenService;
 
-    [HttpPost("login")]
-    public IActionResult Login([FromBody] LoginRequest model)
-    {
-        if (model.Email == "admin@vasis.com" && model.Senha == "Admin123!")
+        public AuthController(ApplicationDbContext dbContext, TokenService tokenService)
         {
-            var usuario = new Usuario
-            {
-                Id = Guid.Empty, // ou um Guid se for string
-                Email = model.Email
-            };
-
-            var token = _tokenService.GerarToken(usuario);
-            return Ok(new { token });
+            _dbContext = dbContext;
+            _tokenService = tokenService;
         }
 
-        return Unauthorized("Usuário ou senha inválidos");
+        [HttpPost("login")]
+        public async Task<IActionResult> Login([FromBody] LoginRequestDto loginRequest)
+        {
+            var usuario = _dbContext.Usuarios
+                .FirstOrDefault(u => u.Email == loginRequest.Email);
+
+            if (usuario == null || usuario.Senha != loginRequest.Senha)
+            {
+                return Unauthorized("Email ou senha inválidos.");
+            }
+
+            var token = _tokenService.GerarToken(usuario);
+
+            return Ok(new LoginResponseDto
+            {
+                Token = token
+            });
+        }
     }
 }

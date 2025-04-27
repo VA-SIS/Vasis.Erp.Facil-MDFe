@@ -8,7 +8,7 @@ namespace Vasis.Erp.Facil.Api.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize]
+    [Authorize] // 👈 Exige autenticação JWT
     public class EmpresaController : ControllerBase
     {
         private readonly IEmpresaService _empresaService;
@@ -29,22 +29,26 @@ namespace Vasis.Erp.Facil.Api.Controllers
         public async Task<IActionResult> GetById(Guid id)
         {
             var empresa = await _empresaService.GetByIdAsync(id);
-            if (empresa == null) return NotFound();
+            if (empresa == null)
+                return NotFound();
+
             return Ok(empresa);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(EmpresaDto dto)
+        public async Task<IActionResult> Create([FromBody] EmpresaDto dto)
         {
             var result = await _empresaService.CreateAsync(dto);
             return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(Guid id, EmpresaDto dto)
+        public async Task<IActionResult> Update(Guid id, [FromBody] EmpresaDto dto)
         {
             var result = await _empresaService.UpdateAsync(id, dto);
-            if (result == null) return NotFound();
+            if (result == null)
+                return NotFound();
+
             return Ok(result);
         }
 
