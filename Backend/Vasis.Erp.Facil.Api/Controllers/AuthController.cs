@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Vasis.Erp.Facil.Data.Context;
-using Vasis.Erp.Facil.Application.Services;
 using Vasis.Erp.Facil.Shared.DTOs.Auth;
+using Vasis.Erp.Facil.Api.Services;
 
 namespace Vasis.Erp.Facil.Api.Controllers
 {
@@ -29,7 +29,7 @@ namespace Vasis.Erp.Facil.Api.Controllers
                 return Unauthorized("Email ou senha inválidos.");
             }
 
-            var token = _tokenService.GerarToken(usuario);
+            var token =  _tokenService.GenerateToken(usuario);
 
             return Ok(new LoginResponseDto
             {

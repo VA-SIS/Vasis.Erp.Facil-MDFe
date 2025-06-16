@@ -1,22 +1,14 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
-using Vasis.Erp.Facil.Data.Context;
-using Vasis.Erp.Facil.Data.Seed;
-using Vasis.Erp.Facil.Application.Services; // Adicionar TokenService se necessário
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Configurar DbContext
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+// Carrega configuração do appsettings.json
+builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
 
-// 👇 REGISTRAR CONTROLADORES - ISSO QUE FALTAVA
-builder.Services.AddControllers();
-
-// Configurar Autenticação JWT
+// Configura autenticação JWT
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -27,84 +19,63 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
             IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"] ?? throw new InvalidOperationException("Chave JWT não configurada."))
+                Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:Secret"])
             )
         };
     });
 
-// Configurar Autorização
-builder.Services.AddAuthorization();
-
-// Adicionar serviços necessários
-builder.Services.AddRazorPages();
-builder.Services.AddServerSideBlazor();
-builder.Services.AddScoped<TokenService>(); // 👈 Adicionar o TokenService
-
-// Configurar Swagger
+// Configura Swagger + Segurança via Bearer Token
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Vasis.Facil.Erp API", Version = "v1" });
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "API MDF-e", Version = "v1" });
 
-    var securityScheme = new OpenApiSecurityScheme
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
-        Name = "Authorization",
-        Type = SecuritySchemeType.Http,
-        Scheme = "bearer",
-        BearerFormat = "JWT",
         In = ParameterLocation.Header,
-        Description = "Digite o token JWT no formato: Bearer {seu token}",
-    };
-    c.AddSecurityDefinition("Bearer", securityScheme);
+        Description = "Informe o token JWT como: Bearer {seu_token}",
+        Name = "Authorization",
+        Type = SecuritySchemeType.ApiKey
+    });
 
-    var securityRequirement = new OpenApiSecurityRequirement
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
         {
             new OpenApiSecurityScheme
             {
-                Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" }
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
             },
-            new string[] {}
+            Array.Empty<string>()
         }
-    };
-    c.AddSecurityRequirement(securityRequirement);
+    });
 });
+
+builder.Services.AddControllers();
 
 var app = builder.Build();
 
-// Aplicar Migrations e Seed de dados
-using (var scope = app.Services.CreateScope())
+// Habilita Swagger apenas em ambiente de desenvolvimento (ou remova essa condição se quiser sempre)
+if (app.Environment.IsDevelopment())
 {
-    var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-
-    await dbContext.Database.MigrateAsync();
-    await DbSeeder.SeedAsync(dbContext);
+    app.UseSwagger();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "API MDF-e v1");
+        c.RoutePrefix = "swagger"; // Acessa em /swagger
+    });
 }
 
-// Pipeline HTTP
-if (!app.Environment.IsDevelopment())
-{
-    app.UseExceptionHandler("/Error");
-    app.UseHsts();
-}
-
-app.UseSwagger();
-app.UseSwaggerUI(c =>
-{
-    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Vasis.Facil.Erp API v1");
-    c.RoutePrefix = "swagger"; // Acessar via /swagger
-});
-
-app.UseHttpsRedirection();
+// Ordem correta dos middlewares
 app.UseStaticFiles();
 app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();
 
-// Mapear endpoints
 app.MapControllers();
-app.MapBlazorHub();
-app.MapFallbackToPage("/_Host");
 
-await app.RunAsync();
+app.Run();

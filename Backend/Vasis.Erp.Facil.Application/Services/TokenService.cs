@@ -1,44 +1,39 @@
-﻿using Microsoft.IdentityModel.Tokens;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using Vasis.Erp.Facil.Shared.Entities;
-using Vasis.Erp.Facil.Shared.Settings;
 
-
-namespace Vasis.Erp.Facil.Application.Services
+namespace Vasis.Erp.Facil.Api.Services
 {
     public class TokenService
     {
-        private readonly JwtSettings _jwtSettings;
+        private readonly IConfiguration _configuration;
 
-        public TokenService(JwtSettings jwtSettings)
+        public TokenService(IConfiguration configuration)
         {
-            _jwtSettings = jwtSettings;
+            _configuration = configuration;
         }
 
-        public string GerarToken(Usuario usuario)
+        public string GenerateToken(Usuario usuario)
         {
-            var key = Encoding.UTF8.GetBytes(_jwtSettings.Secret);
-
             var claims = new[]
             {
                 new Claim(ClaimTypes.NameIdentifier, usuario.Id.ToString()),
-                new Claim(ClaimTypes.Name, usuario.Email),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+                new Claim(ClaimTypes.Name, usuario.Nome),
+                new Claim(ClaimTypes.Email, usuario.Email)
             };
 
-            var credentials = new SigningCredentials(
-                new SymmetricSecurityKey(key),
-                SecurityAlgorithms.HmacSha256
-            );
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JwtSettings:Secret"]));
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             var token = new JwtSecurityToken(
-                issuer: _jwtSettings.Issuer,
-                audience: _jwtSettings.Audience,
+                issuer: _configuration["JwtSettings:Issuer"],
+                audience: _configuration["JwtSettings:Audience"],
                 claims: claims,
-                expires: DateTime.UtcNow.AddHours(_jwtSettings.ExpireHours),
-                signingCredentials: credentials
+                expires: DateTime.Now.AddHours(Convert.ToDouble(_configuration["JwtSettings:ExpireHours"])),
+                signingCredentials: creds
             );
 
             return new JwtSecurityTokenHandler().WriteToken(token);

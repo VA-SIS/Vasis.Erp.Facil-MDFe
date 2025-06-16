@@ -1,9 +1,10 @@
-﻿namespace Vasis.Erp.Facil.Shared.Settings;
-
-public class JwtSettings
+﻿namespace Vasis.Erp.Facil.Shared.Settings
 {
-    public string Secret { get; set; } = string.Empty;
-    public string Issuer { get; set; } = string.Empty;
-    public string Audience { get; set; } = string.Empty;
-    public int ExpireHours { get; set; }
+    public class JwtSettings
+    {
+        public string Secret { get; set; } = string.Empty;
+        public string Issuer { get; set; } = string.Empty;
+        public string Audience { get; set; } = string.Empty;
+        public int ExpireHours { get; set; }
+    }
 }
